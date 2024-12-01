@@ -1,4 +1,5 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
+import { MessagePattern } from '@nestjs/microservices';
 
 import { NotificationsService } from './notifications.service';
 
@@ -6,8 +7,9 @@ import { NotificationsService } from './notifications.service';
 export class NotificationsController {
   constructor(private readonly notificationsService: NotificationsService) {}
 
-  @Get()
-  getHello(): string {
-    return this.notificationsService.getHello();
+  @MessagePattern('notification.send')
+  send({ type }: { type: 'push' | 'email' }) {
+    console.log('Received message');
+    return this.notificationsService.send({ type });
   }
 }

@@ -2,7 +2,15 @@ import { Injectable } from '@nestjs/common';
 
 @Injectable()
 export class NotificationsService {
-  getHello(): string {
-    return 'Hello World!';
+  send({ type }: { type: 'push' | 'email' }) {
+    switch (type) {
+      case 'push': {
+        console.log('Push sent!');
+        break;
+      }
+      default: {
+        console.log('Doing nothing');
+      }
+    }
   }
 }
