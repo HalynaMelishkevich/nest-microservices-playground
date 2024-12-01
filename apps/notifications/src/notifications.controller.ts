@@ -1,15 +1,23 @@
 import { Controller } from '@nestjs/common';
 import { MessagePattern } from '@nestjs/microservices';
+import { CreateNotificationDto, NotificationsPatterns } from '@app/contracts';
 
-import { NotificationsService } from './notifications.service';
+import { PushNotificationsService } from './push-notifications/push-notifications.service';
 
 @Controller()
 export class NotificationsController {
-  constructor(private readonly notificationsService: NotificationsService) {}
+  constructor(
+    private readonly pushNotificationsService: PushNotificationsService,
+  ) {}
 
-  @MessagePattern('notification.send')
-  send({ type }: { type: 'push' | 'email' }) {
-    console.log('Received message');
-    return this.notificationsService.send({ type });
+  @MessagePattern(NotificationsPatterns.sendNotification)
+  send(data: CreateNotificationDto) {
+    console.log(`Received ${data.type} message`);
+
+    switch (data.type) {
+      case 'push': {
+        return this.pushNotificationsService.send(data);
+      }
+    }
   }
 }

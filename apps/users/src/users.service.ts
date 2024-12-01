@@ -1,7 +1,11 @@
 import { Inject, Injectable } from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
-
-import { UserDto } from './dto/user.dto';
+import {
+  CreateUserDto,
+  UserDto,
+  NotificationsPatterns,
+  CreateNotificationDto,
+} from '@app/contracts';
 import { randomUUID } from 'crypto';
 
 @Injectable()
@@ -15,22 +19,25 @@ export class UsersService {
     {
       id: '80f00914-6285-43e7-b33f-8d509ed5f475',
       username: 'test_user_1',
+      createdAt: new Date(),
+      updatedAt: new Date(),
     },
   ];
 
-  create(username: string): string | number {
-    const isDuplicate = this.users.some((user) => user.username === username);
-    if (isDuplicate) return -1; // TODO replace with custom exception
-
+  create(data: CreateUserDto): string {
     const id = randomUUID();
     this.users.push({
       id,
-      username,
+      username: data.username,
+      createdAt: new Date(),
+      updatedAt: new Date(),
     });
 
-    console.log('Sending push notification');
     this.notificationsClient
-      .send('notification.send', { type: 'push' })
+      .send(NotificationsPatterns.sendNotification, {
+        type: 'push',
+        message: 'Notification: User created',
+      } as CreateNotificationDto)
       .subscribe({
         next: (response) => {
           console.log(response);
@@ -39,7 +46,6 @@ export class UsersService {
           console.log(err);
         },
       });
-    console.log('Push notification sent');
 
     return id;
   }
