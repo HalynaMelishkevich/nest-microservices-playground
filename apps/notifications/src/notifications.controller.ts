@@ -1,4 +1,5 @@
 import { Controller, Get } from '@nestjs/common';
+
 import { NotificationsService } from './notifications.service';
 
 @Controller()
