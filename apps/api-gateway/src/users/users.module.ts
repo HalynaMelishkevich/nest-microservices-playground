@@ -11,6 +11,7 @@ import { UsersController } from './users.controller';
         name: 'USERS_CLIENT',
         transport: Transport.TCP,
         options: {
+          host: 'users',
           port: 3001,
         },
       },

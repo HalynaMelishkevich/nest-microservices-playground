@@ -9,6 +9,7 @@ async function bootstrap() {
     {
       transport: Transport.TCP,
       options: {
+        host: 'notifications',
         port: 3002,
       },
       logger: ['log', 'error', 'warn', 'debug', 'verbose'],

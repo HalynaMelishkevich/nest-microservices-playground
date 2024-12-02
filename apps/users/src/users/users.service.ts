@@ -1,42 +1,30 @@
 import { Inject, Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
 import { ClientProxy } from '@nestjs/microservices';
 import {
   CreateUserDto,
-  UserDto,
   NotificationsPatterns,
-  CreateNotificationDto,
+  CreateNotificationDto, UserDto,
 } from '@app/contracts';
-import { randomUUID } from 'crypto';
+import { Repository } from 'typeorm';
+
+import { User } from './entities/user.entity';
 
 @Injectable()
 export class UsersService {
   constructor(
+    @InjectRepository(User) private usersRepository: Repository<User>,
     @Inject('NOTIFICATIONS_CLIENT') private notificationsClient: ClientProxy,
   ) {}
 
-  // TODO replace with DB data
-  private users: UserDto[] = [
-    {
-      id: '80f00914-6285-43e7-b33f-8d509ed5f475',
-      username: 'test_user_1',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    },
-  ];
-
-  create(data: CreateUserDto): string {
-    const id = randomUUID();
-    this.users.push({
-      id,
-      username: data.username,
-      createdAt: new Date(),
-      updatedAt: new Date(),
-    });
+  async create(data: CreateUserDto): Promise<string> {
+    const user = this.usersRepository.create(data);
+    const { id } = await this.usersRepository.save(user);
 
     this.notificationsClient
       .send(NotificationsPatterns.sendNotification, {
         type: 'push',
-        message: 'Notification: User created',
+        message: `Notification: User created with id ${id}`,
       } as CreateNotificationDto)
       .subscribe({
         next: (response) => {
@@ -48,5 +36,9 @@ export class UsersService {
       });
 
     return id;
+  }
+
+  async getUserById(id: string): Promise<UserDto> {
+    return this.usersRepository.findOneBy({ id });
   }
 }

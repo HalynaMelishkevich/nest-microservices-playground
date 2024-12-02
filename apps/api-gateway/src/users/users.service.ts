@@ -6,7 +6,11 @@ import { CreateUserDto, UsersPatterns } from '@app/contracts';
 export class UsersService {
   constructor(@Inject('USERS_CLIENT') private usersClient: ClientProxy) {}
 
-  create(data: CreateUserDto) {
+  async create(data: CreateUserDto) {
     return this.usersClient.send(UsersPatterns.createUser, data);
+  }
+
+  async getUserById(id: string) {
+    return this.usersClient.send(UsersPatterns.getUserById, id);
   }
 }
