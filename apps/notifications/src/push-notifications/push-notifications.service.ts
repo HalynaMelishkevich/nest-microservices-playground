@@ -1,20 +1,23 @@
 import { Injectable } from '@nestjs/common';
 import { CreateNotificationDto } from '@app/contracts';
 import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
 import { lastValueFrom } from 'rxjs';
 
 @Injectable()
 export class PushNotificationsService {
-  constructor(private readonly httpService: HttpService) {}
+  private readonly pushWebhookUrl: string;
+
+  constructor(
+    private readonly httpService: HttpService,
+    private readonly configService: ConfigService,
+  ) {
+    this.pushWebhookUrl = this.configService.get<string>('PUSH_WEBHOOK_URL');
+  }
 
   async send(data: CreateNotificationDto) {
     try {
-      await lastValueFrom(
-        this.httpService.post(
-          'https://webhook.site/5d9f6579-4f16-4e3d-b345-a5461b31bb07', // TODO move to configs
-          data,
-        ),
-      );
+      await lastValueFrom(this.httpService.post(this.pushWebhookUrl, data));
       console.log(
         `Push notification sent with message: "${data.message}" at ${new Date().toISOString()}`,
       );

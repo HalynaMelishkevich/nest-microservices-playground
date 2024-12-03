@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RabbitMQModule } from '@golevelup/nestjs-rabbitmq';
+import { ConfigModule } from '@nestjs/config';
 
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
@@ -8,6 +9,9 @@ import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      isGlobal: true,
+    }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       url: 'postgres://root:root@postgres:5432/users',
@@ -27,7 +31,7 @@ import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
           },
         },
       ],
-      uri: `${process.env.RABBITMQ_URL}`,
+      uri: `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_USER}@${process.env.RABBITMQ_HOST}:${process.env.RABBITMQ_PORT}`,
       connectionInitOptions: { wait: false },
       enableControllerDiscovery: true,
     }),

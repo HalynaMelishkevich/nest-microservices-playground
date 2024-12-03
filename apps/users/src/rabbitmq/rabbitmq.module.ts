@@ -17,7 +17,7 @@ import { RabbitmqService } from './rabbitmq.service';
           },
         },
       ],
-      uri: `${process.env.RABBITMQ_URL}`,
+      uri: `amqp://${process.env.RABBITMQ_USER}:${process.env.RABBITMQ_USER}@${process.env.RABBITMQ_HOST}:${process.env.RABBITMQ_PORT}`,
       connectionInitOptions: { wait: false },
       enableControllerDiscovery: true,
     }),

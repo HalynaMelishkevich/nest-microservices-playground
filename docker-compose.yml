@@ -4,16 +4,14 @@ services:
     image: postgres:15
     container_name: postgres-db
     restart: always
-    environment:
-      POSTGRES_USER: root
-      POSTGRES_PASSWORD: root
-      POSTGRES_DB: users
+    env_file:
+      - .env
     ports:
       - "5432:5432"
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
-      - db
+      - app-private
 
   rabbitmq:
     build:
@@ -21,16 +19,13 @@ services:
       dockerfile: apps/notifications/rmq.Dockerfile
     container_name: rabbitmq
     hostname: rabbitmq
+    env_file:
+      - .env
     ports:
       - 15672:15672
       - 5672:5672
-    environment:
-      RABBITMQ_DEFAULT_USER: rabbitmq
-      RABBITMQ_DEFAULT_PASS: rabbitmq
-      RABBITMQ_USER: rabbitmq
-      RABBITMQ_PASS: rabbitmq
     networks:
-      - app
+      - app-private
 
   notifications:
     build:
@@ -38,14 +33,14 @@ services:
       dockerfile: apps/notifications/Dockerfile
     container_name: notifications
     restart: always
+    env_file:
+      - .env
     ports:
       - "3002:3002"
     depends_on:
       - rabbitmq
-    environment:
-      - RABBITMQ_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672
     networks:
-      - app
+      - app-private
 
   users:
     build:
@@ -53,17 +48,16 @@ services:
       dockerfile: apps/users/Dockerfile
     container_name: users
     restart: always
+    env_file:
+      - .env
     ports:
       - "3001:3001"
     depends_on:
       - postgres
       - notifications
       - rabbitmq
-    environment:
-      - RABBITMQ_URL=amqp://rabbitmq:rabbitmq@rabbitmq:5672
     networks:
-      - app
-      - db
+      - app-private
 
   api-gateway:
     build:
@@ -76,13 +70,14 @@ services:
     ports:
       - "3000:3000"
     networks:
-      - app
+      - app-public
+      - app-private
 
 volumes:
   postgres-data:
 
 networks:
-  app:
-    name: app
-  db:
-    name: db
+  app-public:
+    name: app-public
+  app-private:
+    name: app-private
