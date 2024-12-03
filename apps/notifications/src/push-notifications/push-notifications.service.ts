@@ -4,6 +4,8 @@ import { CreateNotificationDto } from '@app/contracts';
 @Injectable()
 export class PushNotificationsService {
   send(data: CreateNotificationDto) {
-    console.log(data.message);
+    console.log(
+      `Push notification sent with message: ${data.message} at ${new Date().toISOString()}`,
+    );
   }
 }

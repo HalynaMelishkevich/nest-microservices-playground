@@ -1,11 +1,18 @@
+export enum NotificationType {
+  push = 'push',
+  email = 'email',
+  sms = 'sms',
+}
+
 export class CreateNotificationDto {
   message: string;
-  type: 'push' | 'email' | 'sms';
+  type: keyof typeof NotificationType;
+  delayMs: number;
 }
 
 export class NotificationDto {
   id: string;
   message: string;
-  type: 'push' | 'email' | 'sms';
+  type: typeof NotificationType;
   createdAt: Date;
 }

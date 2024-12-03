@@ -3,6 +3,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 
 import { UsersModule } from './users/users.module';
 import { User } from './users/entities/user.entity';
+import { RabbitmqModule } from './rabbitmq/rabbitmq.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { User } from './users/entities/user.entity';
       synchronize: true, // TODO disable in production, can cause data loss
     }),
     UsersModule,
+    RabbitmqModule,
   ],
   controllers: [],
   providers: [],

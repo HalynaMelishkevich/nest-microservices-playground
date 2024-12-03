@@ -15,6 +15,21 @@ services:
     networks:
       - db
 
+  rabbitmq:
+    build:
+      context: .
+      dockerfile: apps/notifications/RabbitMQ.Dockerfile
+    container_name: rabbitmq
+    hostname: rabbitmq
+    ports:
+      - '5672:5672'
+      - '15672:15672'
+    environment:
+      - RABBITMQ_DEFAULT_USER=admin
+      - RABBITMQ_DEFAULT_PASS=admin
+    networks:
+      - app
+
   notifications:
     build:
       context: .
@@ -23,6 +38,10 @@ services:
     restart: always
     ports:
       - "3002:3002"
+    depends_on:
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL="amqp://admin:admin@rabbitmq:5672"
     networks:
       - app
 
@@ -37,6 +56,9 @@ services:
     depends_on:
       - postgres
       - notifications
+      - rabbitmq
+    environment:
+      - RABBITMQ_URL="amqp://admin:admin@rabbitmq:5672"
     networks:
       - app
       - db
@@ -60,6 +82,5 @@ volumes:
 networks:
   app:
     name: app
-    driver: bridge
   db:
     name: db
