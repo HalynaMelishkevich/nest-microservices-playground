@@ -79,5 +79,7 @@ volumes:
 networks:
   app-public:
     name: app-public
+    external: true
   app-private:
     name: app-private
+    external: false
