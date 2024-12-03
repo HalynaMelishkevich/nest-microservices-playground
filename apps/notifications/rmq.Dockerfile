@@ -1,7 +1,7 @@
 ARG PLUGIN_VERSION=4.0.2
 ARG BASE_VERSION=4.0.2
 
-FROM ubuntu:22.04 AS builder
+FROM rabbitmq:4.0.2-management AS builder
 
 ARG PLUGIN_VERSION
 
@@ -21,5 +21,3 @@ COPY --from=builder --chown=rabbitmq:rabbitmq \
 	$RABBITMQ_HOME/plugins/rabbitmq_delayed_message_exchange-${PLUGIN_VERSION}.ez
 
 RUN rabbitmq-plugins enable rabbitmq_delayed_message_exchange
-
-RUN rabbitmq-plugins enable rabbitmq_consistent_hash_exchange

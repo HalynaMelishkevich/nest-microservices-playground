@@ -6,7 +6,18 @@ import { CreateNotificationDto } from '@app/contracts';
 export class RabbitmqService {
   constructor(private readonly amqpConnection: AmqpConnection) {}
 
-  async publish(routingKey: string, data: CreateNotificationDto) {
-    await this.amqpConnection.publish('amq.direct', routingKey, data);
+  async publish(
+    routingKey: string,
+    data: CreateNotificationDto,
+    delayMs = 1,
+  ): Promise<void> {
+    await this.amqpConnection.publish(
+      'notification.delayed',
+      routingKey,
+      data,
+      {
+        headers: { 'x-delay': delayMs },
+      },
+    );
   }
 }

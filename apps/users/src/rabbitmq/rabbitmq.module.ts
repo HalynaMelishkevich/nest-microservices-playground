@@ -10,16 +10,16 @@ import { RabbitmqService } from './rabbitmq.service';
     RabbitMQModule.forRoot(RabbitMQModule, {
       exchanges: [
         {
-          name: 'notifications.delayed',
+          name: 'notification.delayed',
           type: 'x-delayed-message',
           options: {
             arguments: { 'x-delayed-type': 'direct' },
           },
         },
       ],
-      uri: process.env.RABBITMQ_URL,
-      // connectionInitOptions: { wait: false },
-      enableControllerDiscovery: false,
+      uri: `${process.env.RABBITMQ_URL}`,
+      connectionInitOptions: { wait: false },
+      enableControllerDiscovery: true,
     }),
   ],
   providers: [RabbitmqService],

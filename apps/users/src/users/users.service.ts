@@ -1,11 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import {
-  CreateNotificationDto,
-  CreateUserDto,
-  RabbitmqRoutingKeys,
-  UserDto,
-} from '@app/contracts';
+import { CreateNotificationDto, CreateUserDto, UserDto } from '@app/contracts';
 import { Repository } from 'typeorm';
 
 import { User } from './entities/user.entity';
@@ -16,18 +11,23 @@ import { NotificationType } from '@app/contracts/notifications/notification.dto'
 export class UsersService {
   constructor(
     @InjectRepository(User) private usersRepository: Repository<User>,
-    // private readonly rabbitMq: RabbitmqService,
+    private readonly rabbitMq: RabbitmqService,
   ) {}
 
   async create(data: CreateUserDto): Promise<string> {
     const user = this.usersRepository.create(data);
     const { id } = await this.usersRepository.save(user);
+    console.log(`User created with id ${id}`);
 
-    // await this.rabbitMq.publish(RabbitmqRoutingKeys.notifications, {
-    //   type: NotificationType.push,
-    //   message: `Notification: User created with id ${id} at ${new Date().toISOString()}`,
-    //   delayMs: 1000, // TODO 24 * 60 * 60 * 1000, move to configs
-    // } as CreateNotificationDto);
+    await this.rabbitMq.publish(
+      'notifications',
+      {
+        type: NotificationType.push,
+        message: `Notification: User created with id ${id} at ${new Date().toISOString()}`,
+      } as CreateNotificationDto,
+      24 * 60 * 60 * 1000,
+    );
+    console.log('Notification scheduled');
 
     return id;
   }
